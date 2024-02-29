@@ -31,3 +31,8 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save()
+
+
+class ProductImage(models.Model):
+    image = models.ImageField(upload_to='products_img/')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')

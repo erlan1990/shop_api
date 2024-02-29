@@ -1,8 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .utils import send_activation_code
+# from .utils import send_activation_code
+from .tasks import send_activation_code_celery
 # from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 # from django.contrib.auth import authenticate
+
 
 User = get_user_model()
 
@@ -35,5 +37,5 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        send_activation_code(user.email, user.activation_code)
+        send_activation_code_celery.delay(user.email, user.activation_code)
         return user

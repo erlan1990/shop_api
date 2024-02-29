@@ -5,6 +5,18 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from .serializers import RegisterSerializer # UserSerializer
 # from rest_framework_simplejwt.tokens import RefreshToken
+from drf_yasg.utils import swagger_auto_schema
+
+
+
+class RegisterView(APIView):
+    @swagger_auto_schema(request_body=RegisterSerializer())
+    def post(self, request):
+        data = request.data
+        serializer = RegisterSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response('Successfully registered', status=201)
 
 
 # class TokenObtainView(APIView):
@@ -20,15 +32,6 @@ from .serializers import RegisterSerializer # UserSerializer
 #             'access': str(access_token)
 #         })
 
-
-class RegisterView(APIView):
-    def post(self, request):
-        data = request.data
-        serializer = RegisterSerializer(data=data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return Response('Successfully registered', status=201)
-    
 
 class ActivateView(APIView):
     def get(self, request, email, activation_code):

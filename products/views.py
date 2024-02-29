@@ -1,10 +1,11 @@
 from django.shortcuts import render
 
 from rest_framework.viewsets import ModelViewSet
-from .models import Category, Product
-from .serializers import ProductListSerializer, ProductSerializer, CategorySerializer
+from .models import Category, Product, ProductImage
+from .serializers import ProductListSerializer, ProductSerializer, CategorySerializer, ProductImageSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class PermissionMixin:
@@ -33,8 +34,16 @@ class CategoryViewSet(PermissionMixin, ModelViewSet):
 class ProductViewSet(PermissionMixin, ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category', 'in_stock']
 
     def get_serializer_class(self):
         if self.action == 'list':
             return ProductListSerializer
         return self.serializer_class
+    
+
+class ProductImageView(generics.CreateAPIView):
+    queryset = ProductImage.objects.all()
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminUser]
